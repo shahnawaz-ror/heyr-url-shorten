@@ -31,12 +31,14 @@ RSpec.describe 'Short Urls', type: :system do
 
   describe 'show' do
     it 'shows a panel of stats for a given short url' do
+      Url.create(short_url: 'ABCDE', original_url: 'https://github.com')
       visit url_path('ABCDE')
       # expect page to show the short url
     end
 
     context 'when not found' do
       it 'shows a 404 page' do
+        Url.create(short_url: 'NOTFOUND', original_url: 'https://github.com')
         visit url_path('NOTFOUND')
         # expect page to be a 404
       end
@@ -46,6 +48,7 @@ RSpec.describe 'Short Urls', type: :system do
   describe 'create' do
     context 'when url is valid' do
       it 'creates the short url' do
+        Url.create(short_url: 'ABCDE', original_url: 'https://github.com')
         visit '/'
         # add more expections
       end
@@ -71,12 +74,14 @@ RSpec.describe 'Short Urls', type: :system do
 
   describe 'visit' do
     it 'redirects the user to the original url' do
+      Url.create(short_url: 'ABCDE', original_url: 'https://github.com')
       visit visit_path('ABCDE')
       # add more expections
     end
 
     context 'when not found' do
       it 'shows a 404 page' do
+        Url.create(short_url: 'ABCDE', original_url: 'https://github.com')
         visit visit_path('NOTFOUND')
         # expect page to be a 404
       end

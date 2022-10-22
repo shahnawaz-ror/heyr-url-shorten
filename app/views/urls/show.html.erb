@@ -10,6 +10,12 @@
       <li class="collection-item">
         Original URL: <%= link_to @url.original_url %>
       </li>
+      <li class="collection-item">
+        Browser: <%= @url.clicks.pluck(:browser).uniq.join(",") %>
+      </li>
+      <li class="collection-item">
+        Platform: <%= @url.clicks.pluck(:platform).uniq.join(",") %>
+      </li>
     </ul>
   </div>
 </div>
@@ -17,7 +23,8 @@
 <div class="row">
   <div class="col s12">
     <div class="card-panel">
-      <div id="total-clicks-chart"></div>
+      <%= column_chart @url.clicks.group_by_day(:created_at).count, xtitle: "All days", ytitle: "Click Count" %>
+
     </div>
   </div>
 </div>
@@ -25,75 +32,15 @@
 <div class="row">
   <div class="col s6">
     <div class="card-panel">
-      <div id="platforms-chart"></div>
+      <%= column_chart @url.clicks.where(created_at: Date.today.beginning_of_month..Date.today.end_of_month).group_by_day(:created_at).count , xtitle: "Current Month", ytitle: "Click Count"%>
     </div>
   </div>
 
   <div class="col s6">
     <div class="card-panel">
-      <div id="browsers-chart"></div>
+      <%= column_chart @url.clicks.where(created_at: Date.today.beginning_of_year..Date.today.end_of_year).group_by_day(:created_at).count, xtitle: "Current Year", ytitle: "Click Count" %>
+
     </div>
   </div>
 </div>
 
-<script>
-  google.charts.load('current', {packages: ['corechart']});
-  google.charts.setOnLoadCallback(drawCharts);
-
-  function drawTotalClicksChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['day', 'clicks'],
-    ].concat(<%= raw @daily_clicks %>));
-
-    var options = {
-      title: 'total clicks',
-      haxis: {
-        title: 'day of month'
-      },
-      vaxis: {
-        title: 'clicks'
-      }
-    };
-
-    var chart = new google.visualization.AreaChart(
-      document.getElementById('total-clicks-chart')
-    );
-    chart.draw(data, options);
-  }
-
-  function drawBrowsersChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['browser', 'clicks'],
-    ].concat(<%= raw @browsers_clicks %>));
-
-    var options = {
-      title: 'Browsers'
-    };
-
-    var chart = new google.visualization.PieChart(
-      document.getElementById('browsers-chart')
-    );
-    chart.draw(data, options);
-  }
-
-  function drawPlatformsChart() {
-    var data = google.visualization.arrayToDataTable([
-      ['platform', 'clicks'],
-    ].concat(<%= raw @platform_clicks %>));
-
-    var options = {
-      title: 'Platform'
-    };
-
-    var chart = new google.visualization.PieChart(
-      document.getElementById('platforms-chart')
-    );
-    chart.draw(data, options);
-  }
-
-  function drawCharts() {
-    drawTotalClicksChart();
-    drawBrowsersChart();
-    drawPlatformsChart();
-  }
- </script>
